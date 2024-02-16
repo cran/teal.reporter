@@ -2,6 +2,15 @@
 #' @description add quoted attribute for `yaml` package
 #' @param x `character`
 #' @keywords internal
+#' @examples
+#' yaml_quoted <- getFromNamespace("yaml_quoted", "teal.reporter")
+#' yaml <- list(
+#'   author = yaml_quoted("NEST"),
+#'   title = yaml_quoted("Report"),
+#'   date = yaml_quoted("07/04/2019"),
+#'   output = list(pdf_document = list(keep_tex = TRUE))
+#' )
+#' yaml::as.yaml(yaml)
 yaml_quoted <- function(x) {
   attr(x, "quoted") <- TRUE
   x
@@ -11,6 +20,16 @@ yaml_quoted <- function(x) {
 #' @description wrap a `yaml` string to the `markdown` header.
 #' @param x `character` `yaml` formatted string.
 #' @keywords internal
+#' @examples
+#' yaml_quoted <- getFromNamespace("yaml_quoted", "teal.reporter")
+#' yaml <- list(
+#'   author = yaml_quoted("NEST"),
+#'   title = yaml_quoted("Report"),
+#'   date = yaml_quoted("07/04/2019"),
+#'   output = list(pdf_document = list(keep_tex = TRUE))
+#' )
+#' md_header <- getFromNamespace("md_header", "teal.reporter")
+#' md_header(yaml::as.yaml(yaml))
 md_header <- function(x) {
   paste0("---\n", x, "---\n")
 }
@@ -24,6 +43,16 @@ md_header <- function(x) {
 #' @param silent `logical` if to suppress the messages and warnings.
 #' @return `input` argument or the appropriate `logical` value.
 #' @keywords internal
+#' @examples
+#'
+#' conv_str_logi <- getFromNamespace("conv_str_logi", "teal.reporter")
+#' conv_str_logi("TRUE")
+#' conv_str_logi("True")
+#'
+#' conv_str_logi("off")
+#' conv_str_logi("n")
+#'
+#' conv_str_logi("sth")
 conv_str_logi <- function(input,
                           name = "",
                           pos_logi = c("TRUE", "true", "True", "yes", "y", "Y", "on"),
@@ -237,4 +266,27 @@ as_yaml_auto <- function(input_list,
 #' print(out)
 print.rmd_yaml_header <- function(x, ...) {
   cat(x, ...)
+}
+
+#' Parses `yaml` text, extracting the specified field. Returns list names if it's a list;
+#' otherwise, the field itself.
+#'
+#' @param yaml_text A character vector containing the `yaml` text.
+#' @param field_name The name of the field to extract.
+#'
+#' @return if the field is a list, it returns the names of elements in the list; otherwise,
+#' it returns the extracted field.
+#'
+#' @keywords internal
+get_yaml_field <- function(yaml_text, field_name) {
+  checkmate::assert_multi_class(yaml_text, c("rmd_yaml_header", "character"))
+  checkmate::assert_string(field_name)
+
+  yaml_obj <- yaml::yaml.load(yaml_text)
+
+  result <- yaml_obj[[field_name]]
+  if (is.list(result)) {
+    result <- names(result)
+  }
+  result
 }

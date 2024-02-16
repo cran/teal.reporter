@@ -48,6 +48,14 @@ card <- ReportCard$new()$append_rcode("2+2", echo = FALSE)
 
 
 ## ------------------------------------------------
+## Method `ReportCard$append_content`
+## ------------------------------------------------
+
+NewpageBlock <- getFromNamespace("NewpageBlock", "teal.reporter")
+card <- ReportCard$new()$append_content(NewpageBlock$new())
+
+
+## ------------------------------------------------
 ## Method `ReportCard$get_content`
 ## ------------------------------------------------
 
@@ -255,7 +263,7 @@ invisibly self
 \if{html}{\out{<a id="method-ReportCard-append_rcode"></a>}}
 \if{latex}{\out{\hypertarget{method-ReportCard-append_rcode}{}}}
 \subsection{Method \code{append_rcode()}}{
-Appends a \code{rmarkdown} R chunk to this \code{ReportCard}.
+Appends an \code{rmarkdown} R chunk to this \code{ReportCard}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ReportCard$append_rcode(text, ...)}\if{html}{\out{</div>}}
 }
@@ -301,6 +309,16 @@ Appends a \code{ContentBlock} to this \code{ReportCard}.
 \subsection{Returns}{
 invisibly self
 }
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{NewpageBlock <- getFromNamespace("NewpageBlock", "teal.reporter")
+card <- ReportCard$new()$append_content(NewpageBlock$new())
+
+}
+\if{html}{\out{</div>}}
+
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ReportCard-get_content"></a>}}

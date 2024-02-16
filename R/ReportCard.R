@@ -60,7 +60,7 @@ ReportCard <- R6::R6Class( # nolint: object_name_linter.
       self$append_content(TextBlock$new(text, style))
       invisible(self)
     },
-    #' @description Appends a `rmarkdown` R chunk to this `ReportCard`.
+    #' @description Appends an `rmarkdown` R chunk to this `ReportCard`.
     #'
     #' @param text (`character(0)` or `character(1)`) the text
     #' @param ... any `rmarkdown` R chunk parameter and its value.
@@ -76,10 +76,11 @@ ReportCard <- R6::R6Class( # nolint: object_name_linter.
     #'
     #' @param content (`ContentBlock`)
     #' @return invisibly self
+    #' @examples
+    #' NewpageBlock <- getFromNamespace("NewpageBlock", "teal.reporter")
+    #' card <- ReportCard$new()$append_content(NewpageBlock$new())
     #'
     append_content = function(content) {
-      # example: # nolint
-      # card <- ReportCard$new()$append_content(teal.reporter:::NewpageBlock$new()) # nolint
       checkmate::assert_class(content, "ContentBlock")
       private$content <- append(private$content, content)
       invisible(self)

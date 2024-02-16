@@ -11,7 +11,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
 
-<meta name="date" content="2022-06-08" />
 
 <title>Getting Started with teal.reporter</title>
 
@@ -338,7 +337,6 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 <h1 class="title toc-ignore">Getting Started with teal.reporter</h1>
-<h4 class="date">2022-06-08</h4>
 
 
 
@@ -356,18 +354,18 @@ module with minimal input from users of the <code>shiny</code> modules
 and from you as its developer.</p>
 <p>And it can be done as easy as adding one of the reporting tools to
 your module:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(teal.reporter)</span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>ui <span class="ot">&lt;-</span> shiny<span class="sc">::</span><span class="fu">fluidPage</span>(<span class="fu">simple_reporter_ui</span>(<span class="st">&quot;simple&quot;</span>))</span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>server <span class="ot">&lt;-</span> <span class="cf">function</span>(input, output, session) {</span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>  <span class="co"># The bulk of your module logic here</span></span>
-<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>  create_module_card <span class="ot">&lt;-</span> <span class="cf">function</span>(card) {</span>
-<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>    card<span class="sc">$</span><span class="fu">append_text</span>(<span class="st">&quot;This is the content of the report from the `simple` module&quot;</span>)</span>
-<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>  }</span>
-<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>  <span class="fu">simple_reporter_srv</span>(<span class="st">&quot;simple&quot;</span>, Reporter<span class="sc">$</span><span class="fu">new</span>(), create_module_card)</span>
-<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>}</span>
-<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">interactive</span>()) shiny<span class="sc">::</span><span class="fu">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(teal.reporter)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>ui <span class="ot">&lt;-</span> shiny<span class="sc">::</span><span class="fu">fluidPage</span>(<span class="fu">simple_reporter_ui</span>(<span class="st">&quot;simple&quot;</span>))</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>server <span class="ot">&lt;-</span> <span class="cf">function</span>(input, output, session) {</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># The bulk of your module logic here</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  create_module_card <span class="ot">&lt;-</span> <span class="cf">function</span>(card) {</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    card<span class="sc">$</span><span class="fu">append_text</span>(<span class="st">&quot;This is the content of the report from the `simple` module&quot;</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">simple_reporter_srv</span>(<span class="st">&quot;simple&quot;</span>, Reporter<span class="sc">$</span><span class="fu">new</span>(), create_module_card)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">interactive</span>()) shiny<span class="sc">::</span><span class="fu">shinyApp</span>(ui, server)</span></code></pre></div>
 </div>
 <div id="where-to-next" class="section level2">
 <h2>Where to next</h2>
@@ -386,7 +384,7 @@ on a “report previewer” module</a>.</p>
 <div id="integration-with-teal" class="section level3">
 <h3>Integration with <code>teal</code></h3>
 <p>If you are interested in how <code>teal.reporter</code> fits into <a href="https://insightsengineering.github.io/teal/"><code>teal</code></a>,
-look for <a href="https://insightsengineering.github.io/teal/main/articles/adding-support-for-reporting.html">a
+look for <a href="https://insightsengineering.github.io/teal/latest-tag/articles/adding-support-for-reporting.html">a
 vignette about it in <code>teal</code></a>.</p>
 </div>
 <div id="more-control" class="section level3">

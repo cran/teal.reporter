@@ -8,6 +8,17 @@
 
 \code{TableBlock}
 }
+\examples{
+
+## ------------------------------------------------
+## Method `TableBlock$set_content`
+## ------------------------------------------------
+
+TableBlock <- getFromNamespace("TableBlock", "teal.reporter")
+block <- TableBlock$new()
+block$set_content(iris)
+
+}
 \keyword{internal}
 \section{Super classes}{
 \code{\link[teal.reporter:ContentBlock]{teal.reporter::ContentBlock}} -> \code{\link[teal.reporter:FileBlock]{teal.reporter::FileBlock}} -> \code{TableBlock}
@@ -42,7 +53,8 @@ Returns a new \code{TableBlock} object
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{table}}{(\code{data.frame}, \code{rtables}, \code{TableTree}, \code{ElementaryTable}) a table assigned to this \code{TableBlock}}
+\item{\code{table}}{(\code{data.frame}, \code{rtables}, \code{TableTree}, \code{ElementaryTable}, \code{listing_df}) a table assigned to
+this \code{TableBlock}}
 }
 \if{html}{\out{</div>}}
 }
@@ -62,7 +74,8 @@ Sets content of this \code{TableBlock}.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{content}}{(\code{data.frame}, \code{rtables}, \code{TableTree}, \code{ElementaryTable}) a table assigned to this \code{TableBlock}}
+\item{\code{content}}{(\code{data.frame}, \code{rtables}, \code{TableTree}, \code{ElementaryTable}, \code{listing_df}) a table assigned to
+this \code{TableBlock}}
 }
 \if{html}{\out{</div>}}
 }
@@ -73,6 +86,17 @@ throws if argument is not a table-like object.
 \subsection{Returns}{
 invisibly self
 }
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{TableBlock <- getFromNamespace("TableBlock", "teal.reporter")
+block <- TableBlock$new()
+block$set_content(iris)
+
+}
+\if{html}{\out{</div>}}
+
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TableBlock-clone"></a>}}
