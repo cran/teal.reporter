@@ -1,6 +1,8 @@
 ## -----------------------------------------------------------------------------
 library(teal.reporter)
-ui <- shiny::fluidPage(simple_reporter_ui("simple"))
+library(shiny)
+
+ui <- fluidPage(simple_reporter_ui("simple"))
 server <- function(input, output, session) {
   # The bulk of your module logic here
 
@@ -10,5 +12,5 @@ server <- function(input, output, session) {
   simple_reporter_srv("simple", Reporter$new(), create_module_card)
 }
 
-if (interactive()) shiny::shinyApp(ui, server)
+if (interactive()) shinyApp(ui, server)
 

@@ -4,11 +4,12 @@ library(teal.reporter)
 library(ggplot2)
 library(rtables)
 library(DT)
+library(bslib)
 
 ## -----------------------------------------------------------------------------
 ui <- fluidPage(
   # please, specify specific bootstrap version and theme
-  theme = bslib::bs_theme(version = "4"),
+  theme = bs_theme(version = "4"),
   titlePanel(""),
   tabsetPanel(
     tabPanel(
@@ -24,7 +25,7 @@ ui <- fluidPage(
             tabPanel("Plot", plotOutput("dist_plot")),
             tabPanel("Table", verbatimTextOutput("table")),
             tabPanel("Table DataFrame", verbatimTextOutput("table2")),
-            tabPanel("Table DataTable", DT::dataTableOutput("table3"))
+            tabPanel("Table DataTable", dataTableOutput("table3"))
           )
         )
       )
@@ -41,7 +42,7 @@ server <- function(input, output, session) {
   output$encoding <- renderUI({
     tagList(
       ### REPORTER
-      teal.reporter::simple_reporter_ui("simple_reporter"),
+      simple_reporter_ui("simple_reporter"),
       ###
       if (input$tabs == "Plot") {
         sliderInput(
@@ -66,8 +67,8 @@ server <- function(input, output, session) {
   plot <- reactive({
     req(input$binwidth)
     x <- mtcars$mpg
-    ggplot2::ggplot(data = mtcars, ggplot2::aes(x = mpg)) +
-      ggplot2::geom_histogram(binwidth = input$binwidth)
+    ggplot(data = mtcars, aes(x = mpg)) +
+      geom_histogram(binwidth = input$binwidth)
   })
   output$dist_plot <- renderPlot(plot())
 
@@ -90,10 +91,10 @@ server <- function(input, output, session) {
     data
   })
   output$table2 <- renderPrint(print.data.frame(table2()))
-  output$table3 <- DT::renderDataTable(table2())
+  output$table3 <- renderDataTable(table2())
 
   ### REPORTER
-  reporter <- teal.reporter::Reporter$new()
+  reporter <- Reporter$new()
   card_fun <- function(card = ReportCard$new(), comment) {
     if (input$tabs == "Plot") {
       card$set_name("Plot Module")
@@ -152,8 +153,8 @@ server <- function(input, output, session) {
     }
     card
   }
-  teal.reporter::simple_reporter_srv("simple_reporter", reporter = reporter, card_fun = card_fun)
-  teal.reporter::reporter_previewer_srv("prev", reporter)
+  simple_reporter_srv("simple_reporter", reporter = reporter, card_fun = card_fun)
+  reporter_previewer_srv("prev", reporter)
   ###
 }
 
