@@ -12,27 +12,20 @@ facilitating the creation, manipulation, and serialization of report-related dat
 }
 \note{
 The function has to be used in the shiny reactive context.
+
+if Report has an id when converting to JSON then It will be compared to the currently available one.
+
+if Report has an id when converting to JSON then It will be compared to the currently available one.
 }
 \examples{
-
-## ------------------------------------------------
-## Method `Reporter$new`
-## ------------------------------------------------
-
-reporter <- Reporter$new()
-
-
-## ------------------------------------------------
-## Method `Reporter$append_cards`
-## ------------------------------------------------
-
+\dontshow{if (require("ggplot2")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(ggplot2)
 library(rtables)
 
 card1 <- ReportCard$new()
 
 card1$append_text("Header 2 text", "header2")
-card1$append_text("A paragraph of default text", "header2")
+card1$append_text("A paragraph of default text")
 card1$append_plot(
   ggplot(iris, aes(x = Petal.Length)) + geom_histogram()
 )
@@ -40,26 +33,22 @@ card1$append_plot(
 card2 <- ReportCard$new()
 
 card2$append_text("Header 2 text", "header2")
-card2$append_text("A paragraph of default text", "header2")
+card2$append_text("A paragraph of default text")
 lyt <- analyze(split_rows_by(basic_table(), "Day"), "Ozone", afun = mean)
 table_res2 <- build_table(lyt, airquality)
 card2$append_table(table_res2)
-card2$append_table(iris)
 
 reporter <- Reporter$new()
 reporter$append_cards(list(card1, card2))
-
-## ------------------------------------------------
-## Method `Reporter$get_cards`
-## ------------------------------------------------
-
+\dontshow{\}) # examplesIf}
+\dontshow{if (require("ggplot2")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(ggplot2)
 library(rtables)
 
 card1 <- ReportCard$new()
 
 card1$append_text("Header 2 text", "header2")
-card1$append_text("A paragraph of default text", "header2")
+card1$append_text("A paragraph of default text")
 card1$append_plot(
  ggplot(iris, aes(x = Petal.Length)) + geom_histogram()
 )
@@ -67,27 +56,23 @@ card1$append_plot(
 card2 <- ReportCard$new()
 
 card2$append_text("Header 2 text", "header2")
-card2$append_text("A paragraph of default text", "header2")
+card2$append_text("A paragraph of default text")
 lyt <- analyze(split_rows_by(basic_table(), "Day"), "Ozone", afun = mean)
 table_res2 <- build_table(lyt, airquality)
 card2$append_table(table_res2)
-card2$append_table(iris)
 
 reporter <- Reporter$new()
 reporter$append_cards(list(card1, card2))
 reporter$get_cards()
-
-## ------------------------------------------------
-## Method `Reporter$get_blocks`
-## ------------------------------------------------
-
+\dontshow{\}) # examplesIf}
+\dontshow{if (require("ggplot2")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(ggplot2)
 library(rtables)
 
 card1 <- ReportCard$new()
 
 card1$append_text("Header 2 text", "header2")
-card1$append_text("A paragraph of default text", "header2")
+card1$append_text("A paragraph of default text")
 card1$append_plot(
  ggplot(iris, aes(x = Petal.Length)) + geom_histogram()
 )
@@ -95,15 +80,21 @@ card1$append_plot(
 card2 <- ReportCard$new()
 
 card2$append_text("Header 2 text", "header2")
-card2$append_text("A paragraph of default text", "header2")
+card2$append_text("A paragraph of default text")
 lyt <- analyze(split_rows_by(basic_table(), "Day"), "Ozone", afun = mean)
 table_res2 <- build_table(lyt, airquality)
 card2$append_table(table_res2)
-card2$append_table(iris)
 
 reporter <- Reporter$new()
 reporter$append_cards(list(card1, card2))
 reporter$get_blocks()
+\dontshow{\}) # examplesIf}
+
+## ------------------------------------------------
+## Method `Reporter$new`
+## ------------------------------------------------
+
+reporter <- Reporter$new()
 
 
 ## ------------------------------------------------
@@ -194,6 +185,8 @@ reporter$from_jsondir(tmp_dir)
 \item \href{#method-Reporter-from_list}{\code{Reporter$from_list()}}
 \item \href{#method-Reporter-to_jsondir}{\code{Reporter$to_jsondir()}}
 \item \href{#method-Reporter-from_jsondir}{\code{Reporter$from_jsondir()}}
+\item \href{#method-Reporter-set_id}{\code{Reporter$set_id()}}
+\item \href{#method-Reporter-get_id}{\code{Reporter$get_id()}}
 \item \href{#method-Reporter-clone}{\code{Reporter$clone()}}
 }
 }
@@ -238,35 +231,6 @@ Append one or more \code{ReportCard} objects to the \code{Reporter}.
 \subsection{Returns}{
 \code{self}, invisibly.
 }
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{library(ggplot2)
-library(rtables)
-
-card1 <- ReportCard$new()
-
-card1$append_text("Header 2 text", "header2")
-card1$append_text("A paragraph of default text", "header2")
-card1$append_plot(
-  ggplot(iris, aes(x = Petal.Length)) + geom_histogram()
-)
-
-card2 <- ReportCard$new()
-
-card2$append_text("Header 2 text", "header2")
-card2$append_text("A paragraph of default text", "header2")
-lyt <- analyze(split_rows_by(basic_table(), "Day"), "Ozone", afun = mean)
-table_res2 <- build_table(lyt, airquality)
-card2$append_table(table_res2)
-card2$append_table(iris)
-
-reporter <- Reporter$new()
-reporter$append_cards(list(card1, card2))
-}
-\if{html}{\out{</div>}}
-
-}
-
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Reporter-get_cards"></a>}}
@@ -280,36 +244,6 @@ Retrieves all \code{ReportCard} objects contained in the \code{Reporter}.
 \subsection{Returns}{
 A (\code{list}) of \code{\link{ReportCard}} objects.
 }
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{library(ggplot2)
-library(rtables)
-
-card1 <- ReportCard$new()
-
-card1$append_text("Header 2 text", "header2")
-card1$append_text("A paragraph of default text", "header2")
-card1$append_plot(
- ggplot(iris, aes(x = Petal.Length)) + geom_histogram()
-)
-
-card2 <- ReportCard$new()
-
-card2$append_text("Header 2 text", "header2")
-card2$append_text("A paragraph of default text", "header2")
-lyt <- analyze(split_rows_by(basic_table(), "Day"), "Ozone", afun = mean)
-table_res2 <- build_table(lyt, airquality)
-card2$append_table(table_res2)
-card2$append_table(iris)
-
-reporter <- Reporter$new()
-reporter$append_cards(list(card1, card2))
-reporter$get_cards()
-}
-\if{html}{\out{</div>}}
-
-}
-
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Reporter-get_blocks"></a>}}
@@ -331,37 +265,6 @@ Default is a \code{NewpageBlock$new()}object.}
 \subsection{Returns}{
 \code{list()} list of \code{TableBlock}, \code{TextBlock}, \code{PictureBlock} and \code{NewpageBlock}.
 }
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{library(ggplot2)
-library(rtables)
-
-card1 <- ReportCard$new()
-
-card1$append_text("Header 2 text", "header2")
-card1$append_text("A paragraph of default text", "header2")
-card1$append_plot(
- ggplot(iris, aes(x = Petal.Length)) + geom_histogram()
-)
-
-card2 <- ReportCard$new()
-
-card2$append_text("Header 2 text", "header2")
-card2$append_text("A paragraph of default text", "header2")
-lyt <- analyze(split_rows_by(basic_table(), "Day"), "Ozone", afun = mean)
-table_res2 <- build_table(lyt, airquality)
-card2$append_table(table_res2)
-card2$append_table(iris)
-
-reporter <- Reporter$new()
-reporter$append_cards(list(card1, card2))
-reporter$get_blocks()
-
-}
-\if{html}{\out{</div>}}
-
-}
-
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Reporter-reset"></a>}}
@@ -511,7 +414,7 @@ Reinitializes a \code{Reporter} instance by copying the report cards and metadat
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-\code{self}, invisibly.
+invisibly self
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
@@ -652,6 +555,41 @@ reporter$from_jsondir(tmp_dir)
 
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Reporter-set_id"></a>}}
+\if{latex}{\out{\hypertarget{method-Reporter-set_id}{}}}
+\subsection{Method \code{set_id()}}{
+Set the \code{Reporter} id
+Optionally add id to a \code{Reporter} which will be compared when it is rebuilt from a list.
+The id is added to the downloaded file name.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Reporter$set_id(id)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{id}}{(\code{character(1)}) a Report id.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+\code{self}, invisibly.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Reporter-get_id"></a>}}
+\if{latex}{\out{\hypertarget{method-Reporter-get_id}{}}}
+\subsection{Method \code{get_id()}}{
+Get the \code{Reporter} id
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Reporter$get_id()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+\code{character(1)} the \code{Reporter} id.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Reporter-clone"></a>}}

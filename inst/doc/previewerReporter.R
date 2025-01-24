@@ -1,4 +1,4 @@
-## ----message = FALSE----------------------------------------------------------
+## ----message = FALSE, eval=requireNamespace("ggplot2") && requireNamespace("DT")----
 library(shiny)
 library(teal.reporter)
 library(ggplot2)
@@ -6,7 +6,7 @@ library(rtables)
 library(DT)
 library(bslib)
 
-## -----------------------------------------------------------------------------
+## ----eval=requireNamespace("ggplot2")-----------------------------------------
 ui <- fluidPage(
   # please, specify specific bootstrap version and theme
   theme = bs_theme(version = "4"),
@@ -42,7 +42,7 @@ server <- function(input, output, session) {
   output$encoding <- renderUI({
     tagList(
       ### REPORTER
-      simple_reporter_ui("simple_reporter"),
+      teal.reporter::simple_reporter_ui("simple_reporter"),
       ###
       if (input$tabs == "Plot") {
         sliderInput(
@@ -95,6 +95,11 @@ server <- function(input, output, session) {
 
   ### REPORTER
   reporter <- Reporter$new()
+
+  # Optionally set reporter id to e.g. secure report reload only for the same app
+  # The id is added to the downloaded file name.
+  reporter$set_id("myappid")
+
   card_fun <- function(card = ReportCard$new(), comment) {
     if (input$tabs == "Plot") {
       card$set_name("Plot Module")
@@ -153,8 +158,8 @@ server <- function(input, output, session) {
     }
     card
   }
-  simple_reporter_srv("simple_reporter", reporter = reporter, card_fun = card_fun)
-  reporter_previewer_srv("prev", reporter)
+  teal.reporter::simple_reporter_srv("simple_reporter", reporter = reporter, card_fun = card_fun)
+  teal.reporter::reporter_previewer_srv("prev", reporter)
   ###
 }
 

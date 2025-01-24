@@ -16,28 +16,41 @@ testthat::test_that("append_text returns self", {
 })
 
 testthat::test_that("append_table accepts a data.frame", {
-  testthat::expect_no_error(
-    ReportCard$new()$append_table(iris)
+  # https://github.com/davidgohel/flextable/issues/600
+  withr::with_options(
+    opts_partial_match_old,
+    testthat::expect_no_error(
+      ReportCard$new()$append_table(iris)
+    )
   )
 })
 
 testthat::test_that("append_table returns self", {
   card <- ReportCard$new()
-  testthat::expect_identical(card$append_table(iris), card)
+  # https://github.com/davidgohel/flextable/issues/600
+  withr::with_options(
+    opts_partial_match_old,
+    testthat::expect_identical(card$append_table(iris), card)
+  )
 })
 
 testthat::test_that("append_plot returns self", {
+  testthat::skip_if_not_installed("ggplot2")
+
   card <- ReportCard$new()
   testthat::expect_identical(card$append_plot(ggplot2::ggplot(iris)), card)
 })
 
 testthat::test_that("append_plot accepts a ggplot", {
+  testthat::skip_if_not_installed("ggplot2")
   testthat::expect_no_error(
     ReportCard$new()$append_plot(ggplot2::ggplot(iris))
   )
 })
 
 testthat::test_that("append_plot accepts a ggplot with a dim", {
+  testthat::skip_if_not_installed("ggplot2")
+
   testthat::expect_no_error(
     ReportCard$new()$append_plot(ggplot2::ggplot(iris), c(1000L, 100L))
   )
@@ -57,18 +70,24 @@ testthat::test_that("append_rcode returns self", {
 })
 
 testthat::test_that("get_content returns a list of ContentBlock objects", {
+  testthat::skip_if_not_installed("ggplot2")
+
   card <- ReportCard$new()
   card$append_text("test")$append_plot(ggplot2::ggplot(iris))$append_metadata("SRC", "A <- plot()")
   testthat::expect_true(checkmate::test_list(card$get_content(), types = "ContentBlock"))
 })
 
 testthat::test_that("get_metadata returns a list of mixed objects", {
+  testthat::skip_if_not_installed("ggplot2")
+
   card <- ReportCard$new()
   card$append_metadata("sth", "test")$append_metadata("sth2", ggplot2::ggplot(iris))
   testthat::expect_false(checkmate::test_list(card$get_metadata(), types = "ContentBlock"))
 })
 
 testthat::test_that("get_metadata returns a named list", {
+  testthat::skip_if_not_installed("ggplot2")
+
   card <- ReportCard$new()
   card$append_metadata("sth", "test")$append_metadata("sth2", ggplot2::ggplot(iris))
   testthat::expect_equal(c("sth", "sth2"), names(card$get_metadata()))
@@ -118,6 +137,7 @@ testthat::test_that("append_metadata throws error if keys are duplicated", {
 
 
 testthat::test_that("The deep copy constructor copies the file in the content blocks", {
+  testthat::skip_if_not_installed("ggplot2")
   card <- ReportCard$new()
   card$append_text("test")$append_plot(ggplot2::ggplot(iris))$append_metadata("SRC", "A <- plot(1)")
   card_copy <- card$clone(deep = TRUE)
@@ -127,6 +147,8 @@ testthat::test_that("The deep copy constructor copies the file in the content bl
 })
 
 testthat::test_that("The deep copy constructor copies the non ContentBlock objects", {
+  testthat::skip_if_not_installed("ggplot2")
+
   card <- ReportCard$new()
   card$append_text("test")$append_plot(ggplot2::ggplot(iris))$append_metadata("SRC", "A <- plot(1)")
   card_copy <- card$clone(deep = TRUE)
@@ -145,12 +167,15 @@ testthat::test_that("setting and getting a name to the ReportCard", {
   )
 })
 
+testthat::skip_if_not_installed("ggplot2")
+
 card <- ReportCard$new()
 rcode <- "ggplot2::ggplot(iris, ggplot2::aes(x = Petal.Length)) + ggplot2::geom_histogram()"
 card$append_text("Header 2 text", "header2")
 card$append_text("A paragraph of default text", "header2")
 card$append_rcode(rcode)
 card$append_plot(eval(str2lang(rcode)))
+card$append_html(shiny::tags$div("test"))
 
 picture_filename <- basename(card$get_content()[[4]]$get_content())
 temp_dir <- file.path(tempdir(), "test")
@@ -163,8 +188,9 @@ testthat::test_that("to_list internally triggers to_list on each Block", {
       TextBlock = list(text = "Header 2 text", style = "header2"),
       TextBlock = list(text = "A paragraph of default text", style = "header2"),
       RcodeBlock = list(text = rcode, params = list()),
-      PictureBlock = list(basename = picture_filename)
-    ), metadata = list())
+      PictureBlock = list(basename = picture_filename),
+      HTMLBlock = list(content = shiny::tags$div("test"))
+    ), metadata = list(), name = character(0))
   )
   testthat::expect_true(picture_filename %in% list.files(temp_dir))
 })
@@ -175,12 +201,13 @@ testthat::test_that("from_list", {
       TextBlock = list(text = "Header 2 text", style = "header2"),
       TextBlock = list(text = "A paragraph of default text", style = "header2"),
       RcodeBlock = list(text = rcode, params = list()),
-      PictureBlock = list(basename = picture_filename)
+      PictureBlock = list(basename = picture_filename),
+      HTMLBlock = list(content = shiny::tags$div("test"))
     ), metadata = list()),
     temp_dir
   )
   testthat::expect_true(inherits(cardf, "ReportCard"))
-  testthat::expect_length(cardf$get_content(), 4L)
+  testthat::expect_length(cardf$get_content(), 5L)
 })
 
 unlink(temp_dir, recursive = TRUE)

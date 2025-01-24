@@ -4,13 +4,13 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 
-## ----message = FALSE----------------------------------------------------------
+## ----message = FALSE, eval=requireNamespace("ggplot2")------------------------
 library(shiny)
 library(teal.reporter)
 library(ggplot2)
 library(rtables)
 
-## -----------------------------------------------------------------------------
+## ----eval=requireNamespace("ggplot2")-----------------------------------------
 ui <- fluidPage(
   titlePanel(""),
   sidebarLayout(
@@ -104,7 +104,7 @@ server <- function(input, output, session) {
 
 if (interactive()) shinyApp(ui = ui, server = server)
 
-## -----------------------------------------------------------------------------
+## ----eval=requireNamespace("ggplot2")-----------------------------------------
 ui <- fluidPage(
   titlePanel(""),
   sidebarLayout(
@@ -170,6 +170,11 @@ server <- function(input, output, session) {
 
   ### REPORTER
   reporter <- Reporter$new()
+
+  # Optionally set reporter id to e.g. secure report reload only for the same app
+  # The id is added to the downloaded file name.
+  reporter$set_id("myappid")
+
   card_fun <- function(card = ReportCard$new(), comment) {
     if (input$tabs == "Plot") {
       card$append_text("My plot", "header2")

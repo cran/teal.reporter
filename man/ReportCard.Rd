@@ -9,8 +9,50 @@
 
 This \code{R6} class that supports creating a report card containing text, plot, table and
 metadata blocks that can be appended and rendered to form a report output from a \code{shiny} app.
+
+For more information about the various blocks, refer to the vignette:
+\code{vignette("teal-reporter-blocks-overview", "teal.reporter")}.
 }
 \examples{
+\dontshow{if (require("ggplot2")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+library(ggplot2)
+
+card <- ReportCard$new()$append_plot(
+  ggplot(iris, aes(x = Petal.Length)) + geom_histogram()
+)
+\dontshow{\}) # examplesIf}
+\dontshow{if (require("ggplot2")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+library(ggplot2)
+
+card <- ReportCard$new()$append_text("Some text")$append_plot(
+  ggplot(iris, aes(x = Petal.Length)) + geom_histogram()
+)$append_text("Some text")$append_metadata(key = "lm",
+                  value = lm(Ozone ~ Solar.R, airquality))
+card$get_content()
+card$get_metadata()
+\dontshow{\}) # examplesIf}
+\dontshow{if (require("ggplot2")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+library(ggplot2)
+
+card <- ReportCard$new()$append_text("Some text")$append_plot(
+  ggplot(iris, aes(x = Petal.Length)) + geom_histogram()
+)$append_text("Some text")$append_metadata(key = "lm",
+                  value = lm(Ozone ~ Solar.R, airquality))
+card$get_content()
+
+card$to_list(tempdir())
+\dontshow{\}) # examplesIf}
+\dontshow{if (require("ggplot2")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+library(ggplot2)
+
+card <- ReportCard$new()$append_text("Some text")$append_plot(
+  ggplot(iris, aes(x = Petal.Length)) + geom_histogram()
+)$append_text("Some text")$append_metadata(key = "lm",
+                  value = lm(Ozone ~ Solar.R, airquality))
+card$get_content()
+
+ReportCard$new()$from_list(card$to_list(tempdir()), tempdir())
+\dontshow{\}) # examplesIf}
 
 ## ------------------------------------------------
 ## Method `ReportCard$new`
@@ -27,14 +69,10 @@ card <- ReportCard$new()$append_table(iris)
 
 
 ## ------------------------------------------------
-## Method `ReportCard$append_plot`
+## Method `ReportCard$append_html`
 ## ------------------------------------------------
 
-library(ggplot2)
-
-card <- ReportCard$new()$append_plot(
-  ggplot(iris, aes(x = Petal.Length)) + geom_histogram()
-)
+card <- ReportCard$new()$append_html(shiny::div("HTML Content"))
 
 
 ## ------------------------------------------------
@@ -79,20 +117,6 @@ card$get_metadata()
 
 
 ## ------------------------------------------------
-## Method `ReportCard$append_metadata`
-## ------------------------------------------------
-
-library(ggplot2)
-
-card <- ReportCard$new()$append_text("Some text")$append_plot(
-  ggplot(iris, aes(x = Petal.Length)) + geom_histogram()
-)$append_text("Some text")$append_metadata(key = "lm",
-                  value = lm(Ozone ~ Solar.R, airquality))
-card$get_content()
-card$get_metadata()
-
-
-## ------------------------------------------------
 ## Method `ReportCard$get_name`
 ## ------------------------------------------------
 
@@ -103,42 +127,13 @@ ReportCard$new()$set_name("NAME")$get_name()
 ## ------------------------------------------------
 
 ReportCard$new()$set_name("NAME")$get_name()
-
-## ------------------------------------------------
-## Method `ReportCard$to_list`
-## ------------------------------------------------
-
-library(ggplot2)
-
-card <- ReportCard$new()$append_text("Some text")$append_plot(
-  ggplot(iris, aes(x = Petal.Length)) + geom_histogram()
-)$append_text("Some text")$append_metadata(key = "lm",
-                  value = lm(Ozone ~ Solar.R, airquality))
-card$get_content()
-
-card$to_list(tempdir())
-
-
-## ------------------------------------------------
-## Method `ReportCard$from_list`
-## ------------------------------------------------
-
-library(ggplot2)
-
-card <- ReportCard$new()$append_text("Some text")$append_plot(
-  ggplot(iris, aes(x = Petal.Length)) + geom_histogram()
-)$append_text("Some text")$append_metadata(key = "lm",
-                  value = lm(Ozone ~ Solar.R, airquality))
-card$get_content()
-
-ReportCard$new()$from_list(card$to_list(tempdir()), tempdir())
-
 }
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-ReportCard-new}{\code{ReportCard$new()}}
 \item \href{#method-ReportCard-append_table}{\code{ReportCard$append_table()}}
+\item \href{#method-ReportCard-append_html}{\code{ReportCard$append_html()}}
 \item \href{#method-ReportCard-append_plot}{\code{ReportCard$append_plot()}}
 \item \href{#method-ReportCard-append_text}{\code{ReportCard$append_text()}}
 \item \href{#method-ReportCard-append_rcode}{\code{ReportCard$append_rcode()}}
@@ -207,6 +202,35 @@ that can be coerced into a table.}
 
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-ReportCard-append_html"></a>}}
+\if{latex}{\out{\hypertarget{method-ReportCard-append_html}{}}}
+\subsection{Method \code{append_html()}}{
+Appends a html content to this \code{ReportCard}.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ReportCard$append_html(content)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{content}}{An object that can be rendered as a HTML content.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+\code{self}, invisibly.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{card <- ReportCard$new()$append_html(shiny::div("HTML Content"))
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ReportCard-append_plot"></a>}}
 \if{latex}{\out{\hypertarget{method-ReportCard-append_plot}{}}}
 \subsection{Method \code{append_plot()}}{
@@ -227,19 +251,6 @@ Appends a plot to this \code{ReportCard}.
 \subsection{Returns}{
 \code{self}, invisibly.
 }
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{library(ggplot2)
-
-card <- ReportCard$new()$append_plot(
-  ggplot(iris, aes(x = Petal.Length)) + geom_histogram()
-)
-
-}
-\if{html}{\out{</div>}}
-
-}
-
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ReportCard-append_text"></a>}}
@@ -255,7 +266,7 @@ Appends a text paragraph to this \code{ReportCard}.
 \describe{
 \item{\code{text}}{(\code{character}) The text content to add.}
 
-\item{\code{style}}{(\code{character(1)}) the style of the paragraph. One of: \code{default}, \code{header}, \code{verbatim}}
+\item{\code{style}}{(\code{character(1)}) the style of the paragraph. One of: default, header2, header3, verbatim.}
 }
 \if{html}{\out{</div>}}
 }
@@ -416,22 +427,6 @@ Appends metadata to this \code{ReportCard}.
 \subsection{Returns}{
 \code{self}, invisibly.
 }
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{library(ggplot2)
-
-card <- ReportCard$new()$append_text("Some text")$append_plot(
-  ggplot(iris, aes(x = Petal.Length)) + geom_histogram()
-)$append_text("Some text")$append_metadata(key = "lm",
-                  value = lm(Ozone ~ Solar.R, airquality))
-card$get_content()
-card$get_metadata()
-
-}
-\if{html}{\out{</div>}}
-
-}
-
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ReportCard-get_name"></a>}}
@@ -501,23 +496,6 @@ Convert the \code{ReportCard} to a list, including content and metadata.
 \subsection{Returns}{
 (\verb{named list}) a \code{ReportCard} representation.
 }
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{library(ggplot2)
-
-card <- ReportCard$new()$append_text("Some text")$append_plot(
-  ggplot(iris, aes(x = Petal.Length)) + geom_histogram()
-)$append_text("Some text")$append_metadata(key = "lm",
-                  value = lm(Ozone ~ Solar.R, airquality))
-card$get_content()
-
-card$to_list(tempdir())
-
-}
-\if{html}{\out{</div>}}
-
-}
-
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ReportCard-from_list"></a>}}
@@ -540,23 +518,6 @@ Reconstructs the \code{ReportCard} from a list representation.
 \subsection{Returns}{
 \code{self}, invisibly.
 }
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{library(ggplot2)
-
-card <- ReportCard$new()$append_text("Some text")$append_plot(
-  ggplot(iris, aes(x = Petal.Length)) + geom_histogram()
-)$append_text("Some text")$append_metadata(key = "lm",
-                  value = lm(Ozone ~ Solar.R, airquality))
-card$get_content()
-
-ReportCard$new()$from_list(card$to_list(tempdir()), tempdir())
-
-}
-\if{html}{\out{</div>}}
-
-}
-
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ReportCard-clone"></a>}}

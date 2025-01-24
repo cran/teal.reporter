@@ -6,6 +6,9 @@
 #' This `R6` class that supports creating a report card containing text, plot, table and
 #' metadata blocks that can be appended and rendered to form a report output from a `shiny` app.
 #'
+#' For more information about the various blocks, refer to the vignette:
+#' `vignette("teal-reporter-blocks-overview", "teal.reporter")`.
+#'
 #' @export
 #'
 ReportCard <- R6::R6Class( # nolint: object_name_linter.
@@ -34,12 +37,23 @@ ReportCard <- R6::R6Class( # nolint: object_name_linter.
       self$append_content(TableBlock$new(table))
       invisible(self)
     },
+    #' @description Appends a html content to this `ReportCard`.
+    #'
+    #' @param content An object that can be rendered as a HTML content.
+    #' @return `self`, invisibly.
+    #' @examples
+    #' card <- ReportCard$new()$append_html(shiny::div("HTML Content"))
+    #'
+    append_html = function(content) {
+      self$append_content(HTMLBlock$new(content))
+      invisible(self)
+    },
     #' @description Appends a plot to this `ReportCard`.
     #'
     #' @param plot (`ggplot` or `grob` or `trellis`) plot object.
     #' @param dim (`numeric(2)`) width and height in pixels.
     #' @return `self`, invisibly.
-    #' @examples
+    #' @examplesIf require("ggplot2")
     #' library(ggplot2)
     #'
     #' card <- ReportCard$new()$append_plot(
@@ -58,7 +72,7 @@ ReportCard <- R6::R6Class( # nolint: object_name_linter.
     #' @description Appends a text paragraph to this `ReportCard`.
     #'
     #' @param text (`character`) The text content to add.
-    #' @param style (`character(1)`) the style of the paragraph. One of: `default`, `header`, `verbatim`
+    #' @param style (`character(1)`) the style of the paragraph. One of: `r TextBlock$new()$get_available_styles()`.
     #' @return `self`, invisibly.
     #' @examples
     #' card <- ReportCard$new()$append_text("A paragraph of default text")
@@ -129,7 +143,7 @@ ReportCard <- R6::R6Class( # nolint: object_name_linter.
     #' @param key (`character(1)`) string specifying the metadata key.
     #' @param value value associated with the metadata key.
     #' @return `self`, invisibly.
-    #' @examples
+    #' @examplesIf require("ggplot2")
     #' library(ggplot2)
     #'
     #' card <- ReportCard$new()$append_text("Some text")$append_plot(
@@ -162,14 +176,14 @@ ReportCard <- R6::R6Class( # nolint: object_name_linter.
     #' @examples
     #' ReportCard$new()$set_name("NAME")$get_name()
     set_name = function(name) {
-      checkmate::assert_string(name)
+      checkmate::assert_character(name)
       private$name <- name
       invisible(self)
     },
     #' @description Convert the `ReportCard` to a list, including content and metadata.
     #' @param output_dir (`character`) with a path to the directory where files will be copied.
     #' @return (`named list`) a `ReportCard` representation.
-    #' @examples
+    #' @examplesIf require("ggplot2")
     #' library(ggplot2)
     #'
     #' card <- ReportCard$new()$append_text("Some text")$append_plot(
@@ -184,12 +198,11 @@ ReportCard <- R6::R6Class( # nolint: object_name_linter.
       new_blocks <- list()
       for (block in self$get_content()) {
         block_class <- class(block)[1]
-        cblock <- if (inherits(block, "FileBlock")) {
+        formal_args <- formalArgs(block$to_list)
+        cblock <- if ("output_dir" %in% formal_args) {
           block$to_list(output_dir)
-        } else if (inherits(block, "ContentBlock")) {
-          block$to_list()
         } else {
-          list()
+          block$to_list()
         }
         new_block <- list()
         new_block[[block_class]] <- cblock
@@ -198,13 +211,14 @@ ReportCard <- R6::R6Class( # nolint: object_name_linter.
       new_card <- list()
       new_card[["blocks"]] <- new_blocks
       new_card[["metadata"]] <- self$get_metadata()
+      new_card[["name"]] <- self$get_name()
       new_card
     },
     #' @description Reconstructs the `ReportCard` from a list representation.
     #' @param card (`named list`) a `ReportCard` representation.
     #' @param output_dir (`character`) with a path to the directory where a file will be copied.
     #' @return `self`, invisibly.
-    #' @examples
+    #' @examplesIf require("ggplot2")
     #' library(ggplot2)
     #'
     #' card <- ReportCard$new()$append_text("Some text")$append_plot(
@@ -219,24 +233,28 @@ ReportCard <- R6::R6Class( # nolint: object_name_linter.
       self$reset()
       blocks <- card$blocks
       metadata <- card$metadata
+      name <- card$name
+      if (length(name) == 0) name <- character(0)
       blocks_names <- names(blocks)
       blocks_names <- gsub("[.][0-9]*$", "", blocks_names)
       for (iter_b in seq_along(blocks)) {
         block_class <- blocks_names[iter_b]
         block <- blocks[[iter_b]]
-        cblock <- eval(str2lang(sprintf("%s$new()", block_class)))
-        if (inherits(cblock, "FileBlock")) {
-          cblock$from_list(block, output_dir)
-        } else if (inherits(cblock, "ContentBlock")) {
-          cblock$from_list(block)
+        instance <- private$dispatch_block(block_class)
+        formal_args <- formalArgs(instance$new()$from_list)
+        cblock <- if (all(c("x", "output_dir") %in% formal_args)) {
+          instance$new()$from_list(block, output_dir)
+        } else if ("x" %in% formal_args) {
+          instance$new()$from_list(block)
         } else {
-          NULL
+          instance$new()$from_list()
         }
         self$append_content(cblock)
       }
       for (meta in names(metadata)) {
         self$append_metadata(meta, metadata[[meta]])
       }
+      self$set_name(name)
       invisible(self)
     }
   ),
@@ -244,6 +262,9 @@ ReportCard <- R6::R6Class( # nolint: object_name_linter.
     content = list(),
     metadata = list(),
     name = character(0),
+    dispatch_block = function(block_class) {
+      eval(str2lang(block_class))
+    },
     # @description The copy constructor.
     #
     # @param name the name of the field

@@ -6,7 +6,9 @@ testthat::test_that("new returns an object of type Reporter", {
   testthat::expect_true(inherits(Reporter$new(), "Reporter"))
 })
 
-card1 <- teal.reporter::ReportCard$new()
+testthat::skip_if_not_installed("ggplot2")
+
+card1 <- ReportCard$new()
 
 card1$append_text("Header 2 text", "header2")
 card1$append_text("A paragraph of default text", "header2")
@@ -15,17 +17,32 @@ card1$append_plot(
     ggplot2::geom_histogram()
 )
 
-card2 <- teal.reporter::ReportCard$new()
+card2 <- ReportCard$new()
 
 card2$append_text("Header 2 text", "header2")
 card2$append_text("A paragraph of default text", "header2")
 lyt <- rtables::analyze(rtables::split_rows_by(rtables::basic_table(), "Day"), "Ozone", afun = mean)
 table_res2 <- rtables::build_table(lyt, airquality)
-card2$append_table(table_res2)
-card2$append_table(iris)
+# https://github.com/davidgohel/flextable/issues/600
+withr::with_options(
+  opts_partial_match_old,
+  {
+    card2$append_table(table_res2)
+    card2$append_table(iris)
+  }
+)
 
 reporter <- Reporter$new()
 reporter$append_cards(list(card1, card2))
+
+testthat::test_that("default reporter id", {
+  testthat::expect_identical(reporter$get_id(), "")
+})
+
+testthat::test_that("set_id sets the reporter id and returns reporter", {
+  testthat::expect_s3_class(reporter$set_id("xyz"), "Reporter")
+  testthat::expect_identical(reporter$set_id("xyz")$get_id(), "xyz")
+})
 
 testthat::test_that("get_cards returns the same cards which was added to reporter", {
   testthat::expect_identical(reporter$get_cards(), list(card1, card2))
@@ -51,7 +68,7 @@ testthat::test_that("get_blocks and get_cards return empty list by default", {
 })
 
 testthat::test_that("The deep copy constructor copies the content files to new files", {
-  card <- teal.reporter::ReportCard$new()$append_plot(ggplot2::ggplot(iris))
+  card <- ReportCard$new()$append_plot(ggplot2::ggplot(iris))
   reporter <- Reporter$new()$append_cards(list(card))
   reporter_copy <- reporter$clone(deep = TRUE)
   original_content_file <- reporter$get_blocks()[[1]]$get_content()
@@ -102,7 +119,6 @@ testthat::test_that("from_reporter returns identical/equal object from the same 
 
 reporter1 <- Reporter$new()
 reporter1$append_cards(list(card1, card2))
-reporter2 <- Reporter$new()
 
 testthat::test_that("from_reporter does not return identical/equal object form other reporter", {
   testthat::expect_false(identical(reporter1, reporter2$from_reporter(reporter1)))
@@ -119,7 +135,7 @@ testthat::test_that("from_reporter persists the reactive_add_card count", {
   )
 })
 
-testthat::test_that("to_jsondir require the existing directory path", {
+testthat::test_that("to_list require the existing directory path", {
   testthat::expect_error(reporter1$to_list(), 'argument "output_dir" is missing, with no default')
   testthat::expect_error(reporter1$to_list("/path/WRONG"), "Directory '/path/WRONG' does not exist.")
 })
@@ -128,14 +144,14 @@ temp_dir <- file.path(tempdir(), "test")
 unlink(temp_dir, recursive = TRUE)
 dir.create(temp_dir)
 
-testthat::test_that("to_jsondir returns a list.", {
+testthat::test_that("to_list returns a list.", {
   testthat::expect_equal(
-    list(version = "1", cards = list(), metadata = list()),
+    list(name = "teal Reporter", version = "1", id = "", cards = list(), metadata = list()),
     Reporter$new()$to_list(temp_dir)
   )
 })
 
-testthat::test_that("to_jsondir and from_jsondir could be used to save and retrive a Reporter ", {
+testthat::test_that("to_list and from_list could be used to save and retrive a Reporter ", {
   testthat::expect_identical(
     length(reporter1$get_cards()),
     length(Reporter$new()$from_list(reporter1$to_list(temp_dir), temp_dir)$get_cards())
