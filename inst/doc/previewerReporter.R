@@ -6,162 +6,148 @@ library(rtables)
 library(DT)
 library(bslib)
 
-## ----eval=requireNamespace("ggplot2")-----------------------------------------
-ui <- fluidPage(
-  # please, specify specific bootstrap version and theme
-  theme = bs_theme(version = "4"),
-  titlePanel(""),
-  tabsetPanel(
-    tabPanel(
-      "main App",
-      tags$br(),
-      sidebarLayout(
-        sidebarPanel(
-          uiOutput("encoding")
-        ),
-        mainPanel(
-          tabsetPanel(
-            id = "tabs",
-            tabPanel("Plot", plotOutput("dist_plot")),
-            tabPanel("Table", verbatimTextOutput("table")),
-            tabPanel("Table DataFrame", verbatimTextOutput("table2")),
-            tabPanel("Table DataTable", dataTableOutput("table3"))
-          )
-        )
-      )
-    ),
-    ### REPORTER
-    tabPanel(
-      "Previewer",
-      reporter_previewer_ui("prev")
-    )
-    ###
-  )
-)
-server <- function(input, output, session) {
-  output$encoding <- renderUI({
-    tagList(
-      ### REPORTER
-      teal.reporter::simple_reporter_ui("simple_reporter"),
-      ###
-      if (input$tabs == "Plot") {
-        sliderInput(
-          "binwidth",
-          "binwidth",
-          min = 2,
-          max = 10,
-          value = 8
-        )
-      } else if (input$tabs %in% c("Table", "Table DataFrame", "Table DataTable")) {
-        selectInput(
-          "stat",
-          label = "Statistic",
-          choices = c("mean", "median", "sd"),
-          "mean"
-        )
-      } else {
-        NULL
-      }
-    )
-  })
-  plot <- reactive({
-    req(input$binwidth)
-    x <- mtcars$mpg
-    ggplot(data = mtcars, aes(x = mpg)) +
-      geom_histogram(binwidth = input$binwidth)
-  })
-  output$dist_plot <- renderPlot(plot())
-
-  table <- reactive({
-    req(input$stat)
-    lyt <- basic_table() %>%
-      split_rows_by("Month", label_pos = "visible") %>%
-      analyze("Ozone", afun = eval(str2expression(input$stat)))
-    build_table(lyt, airquality)
-  })
-  output$table <- renderPrint(table())
-
-  table2 <- reactive({
-    req(input$stat)
-    data <- aggregate(
-      airquality[, c("Ozone"), drop = FALSE], list(Month = airquality$Month), get(input$stat),
-      na.rm = TRUE
-    )
-    colnames(data) <- c("Month", input$stat)
-    data
-  })
-  output$table2 <- renderPrint(print.data.frame(table2()))
-  output$table3 <- renderDataTable(table2())
-
-  ### REPORTER
-  reporter <- Reporter$new()
-
-  # Optionally set reporter id to e.g. secure report reload only for the same app
-  # The id is added to the downloaded file name.
-  reporter$set_id("myappid")
-
-  card_fun <- function(card = ReportCard$new(), comment) {
-    if (input$tabs == "Plot") {
-      card$set_name("Plot Module")
-      card$append_text("My plot", "header2")
-      card$append_plot(plot())
-      card$append_rcode(
-        paste(
-          c(
-            "x <- mtcars$mpg",
-            "ggplot2::ggplot(data = mtcars, ggplot2::aes(x = mpg)) +",
-            paste0("ggplot2::geom_histogram(binwidth = ", input$binwidth, ")")
-          ),
-          collapse = "\n"
-        ),
-        echo = TRUE,
-        eval = FALSE
-      )
-    } else if (input$tabs == "Table") {
-      card$set_name("Table Module rtables")
-      card$append_text("My rtables", "header2")
-      card$append_table(table())
-      card$append_rcode(
-        paste(
-          c(
-            "lyt <- rtables::basic_table() %>%",
-            'rtables::split_rows_by("Month", label_pos = "visible") %>%',
-            paste0('rtables::analyze("Ozone", afun = ', input$stat, ")"),
-            "rtables::build_table(lyt, airquality)"
-          ),
-          collapse = "\n"
-        ),
-        echo = TRUE,
-        eval = FALSE
-      )
-    } else if (input$tabs %in% c("Table DataFrame", "Table DataTable")) {
-      card$set_name("Table Module DF")
-      card$append_text("My Table DF", "header2")
-      card$append_table(table2())
-      # Here r code added as a regular verbatim text
-      card$append_text(
-        paste0(
-          c(
-            'data <- aggregate(airquality[, c("Ozone"), drop = FALSE], list(Month = airquality$Month), ',
-            input$stat,
-            ", na.rm = TRUE)\n",
-            'colnames(data) <- c("Month", ', paste0('"', input$stat, '"'), ")\n",
-            "data"
-          ),
-          collapse = ""
-        ), "verbatim"
-      )
-    }
-    if (!comment == "") {
-      card$append_text("Comment", "header3")
-      card$append_text(comment)
-    }
-    card
-  }
-  teal.reporter::simple_reporter_srv("simple_reporter", reporter = reporter, card_fun = card_fun)
-  teal.reporter::reporter_previewer_srv("prev", reporter)
-  ###
-}
-
-if (interactive()) shinyApp(ui = ui, server = server)
+## ----eval=requireNamespace("ggplot2") && interactive()------------------------
+# ui <- bslib::page_fluid(
+#   sidebarLayout(
+#     sidebarPanel(
+#       uiOutput("encoding")
+#     ),
+#     mainPanel(
+#       tabsetPanel(
+#         id = "tabs",
+#         tabPanel("Plot", plotOutput("dist_plot")),
+#         tabPanel("Table", verbatimTextOutput("table")),
+#         tabPanel("Table DataFrame", verbatimTextOutput("table2")),
+#         tabPanel("Table DataTable", dataTableOutput("table3"))
+#       )
+#     )
+#   )
+# )
+# server <- function(input, output, session) {
+#   output$encoding <- renderUI({
+#     shiny::tagList(
+#       ### REPORTER
+#       teal.reporter::add_card_button_ui("add_reporter", label = "Add Report Card"),
+#       teal.reporter::preview_report_button_ui("previewer"),
+#       ###
+#       if (input$tabs == "Plot") {
+#         sliderInput(
+#           "binwidth",
+#           "binwidth",
+#           min = 2,
+#           max = 10,
+#           value = 8
+#         )
+#       } else if (input$tabs %in% c("Table", "Table DataFrame", "Table DataTable")) {
+#         selectInput(
+#           "stat",
+#           label = "Statistic",
+#           choices = c("mean", "median", "sd"),
+#           "mean"
+#         )
+#       } else {
+#         NULL
+#       }
+#     )
+#   })
+#   plot <- reactive({
+#     req(input$binwidth)
+#     x <- mtcars$mpg
+#     ggplot(data = mtcars, aes(x = mpg)) +
+#       geom_histogram(binwidth = input$binwidth)
+#   })
+#   output$dist_plot <- renderPlot(plot())
+# 
+#   table <- reactive({
+#     req(input$stat)
+#     lyt <- basic_table() %>%
+#       split_rows_by("Month", label_pos = "visible") %>%
+#       analyze("Ozone", afun = eval(str2expression(input$stat)))
+#     build_table(lyt, airquality)
+#   })
+#   output$table <- renderPrint(table())
+# 
+#   table2 <- reactive({
+#     req(input$stat)
+#     data <- aggregate(
+#       airquality[, c("Ozone"), drop = FALSE], list(Month = airquality$Month), get(input$stat),
+#       na.rm = TRUE
+#     )
+#     colnames(data) <- c("Month", input$stat)
+#     data
+#   })
+#   output$table2 <- renderPrint(print.data.frame(table2()))
+#   output$table3 <- renderDataTable(table2())
+# 
+#   ### REPORTER
+#   reporter <- Reporter$new()
+# 
+#   # Optionally set reporter id to e.g. secure report reload only for the same app
+#   # The id is added to the downloaded file name.
+#   reporter$set_id("myappid")
+# 
+#   card_fun <- function(card = ReportCard$new(), comment) {
+#     if (input$tabs == "Plot") {
+#       card$set_name("Plot Module")
+#       card$append_text("My plot", "header2")
+#       card$append_plot(plot())
+#       card$append_rcode(
+#         paste(
+#           c(
+#             "x <- mtcars$mpg",
+#             "ggplot2::ggplot(data = mtcars, ggplot2::aes(x = mpg)) +",
+#             paste0("ggplot2::geom_histogram(binwidth = ", input$binwidth, ")")
+#           ),
+#           collapse = "\n"
+#         ),
+#         echo = TRUE,
+#         eval = FALSE
+#       )
+#     } else if (input$tabs == "Table") {
+#       card$set_name("Table Module rtables")
+#       card$append_text("My rtables", "header2")
+#       card$append_table(table())
+#       card$append_rcode(
+#         paste(
+#           c(
+#             "lyt <- rtables::basic_table() %>%",
+#             'rtables::split_rows_by("Month", label_pos = "visible") %>%',
+#             paste0('rtables::analyze("Ozone", afun = ', input$stat, ")"),
+#             "rtables::build_table(lyt, airquality)"
+#           ),
+#           collapse = "\n"
+#         ),
+#         echo = TRUE,
+#         eval = FALSE
+#       )
+#     } else if (input$tabs %in% c("Table DataFrame", "Table DataTable")) {
+#       card$set_name("Table Module DF")
+#       card$append_text("My Table DF", "header2")
+#       card$append_table(table2())
+#       # Here r code added as a regular verbatim text
+#       card$append_text(
+#         paste0(
+#           c(
+#             'data <- aggregate(airquality[, c("Ozone"), drop = FALSE], list(Month = airquality$Month), ',
+#             input$stat,
+#             ", na.rm = TRUE)\n",
+#             'colnames(data) <- c("Month", ', paste0('"', input$stat, '"'), ")\n",
+#             "data"
+#           ),
+#           collapse = ""
+#         ), "verbatim"
+#       )
+#     }
+#     if (!comment == "") {
+#       card$append_text("Comment", "header3")
+#       card$append_text(comment)
+#     }
+#     card
+#   }
+#   teal.reporter::add_card_button_srv("add_reporter", reporter = reporter, card_fun = card_fun)
+#   teal.reporter::preview_report_button_srv("previewer", reporter)
+#   ###
+# }
+# 
+# shinyApp(ui = ui, server = server)
 

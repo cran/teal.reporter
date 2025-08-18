@@ -6,12 +6,14 @@
 \alias{add_card_button_srv}
 \title{Add card button module}
 \usage{
-add_card_button_ui(id)
+add_card_button_ui(id, label = NULL)
 
 add_card_button_srv(id, reporter, card_fun)
 }
 \arguments{
 \item{id}{(\code{character(1)}) this \code{shiny} module's id.}
+
+\item{label}{(\code{character(1)}) label of the button. By default it is empty.}
 
 \item{reporter}{(\code{Reporter}) instance.}
 
@@ -21,8 +23,6 @@ add_card_button_srv(id, reporter, card_fun)
 \code{NULL}.
 }
 \description{
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
-
 Provides a button to add views/cards to a report.
 
 For more details see the vignette: \code{vignette("simpleReporter", "teal.reporter")}.

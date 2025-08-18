@@ -1,40 +1,32 @@
-#' User Interface to Load `Reporter`
-#' @description `r lifecycle::badge("experimental")`
-#' Button to upload `ReporterCard`(s) to the `Reporter`.
+#' Load `Reporter` button module
 #'
-#' For more details see the vignette: `vignette("simpleReporter", "teal.reporter")`.
+#' @description
+#'
+#' Provides a button to upload `ReporterCard`(s) to the `Reporter`.
+#'
+#' For more information, refer to the vignette: `vignette("simpleReporter", "teal.reporter")`.
+#'
+#' @name load_report_button
+#'
 #' @param id `character(1)` this `shiny` module's id.
+#' @param label (`character(1)`) label of the button. By default it is empty.
+#' @param reporter [`Reporter`] instance.
+NULL
+
+#' @rdname load_report_button
 #' @return `shiny::tagList`
 #' @export
-report_load_ui <- function(id) {
-  ns <- shiny::NS(id)
-
-  shiny::tagList(
-    shiny::singleton(
-      shiny::tags$head(shiny::includeCSS(system.file("css/custom.css", package = "teal.reporter")))
-    ),
-    shiny::tags$button(
-      id = ns("reporter_load"),
-      type = "button",
-      class = "simple_report_button btn btn-primary action-button",
-      title = "Load",
-      NULL,
-      shiny::tags$span(
-        shiny::icon("upload")
-      )
-    )
+report_load_ui <- function(id, label = NULL) {
+  checkmate::assert_string(label, null.ok = TRUE)
+  .outline_button(
+    shiny::NS(id, "reporter_load"),
+    label = label,
+    icon = "upload"
   )
 }
 
-#' Server to Load `Reporter`
-#' @description `r lifecycle::badge("experimental")`
-#' Server to load `ReporterCard`(s) to the `Reporter`
-#'
-#' For more details see the vignette: `vignette("simpleReporter", "teal.reporter")`.
-#'
-#' @param id `character(1)` this `shiny` module's id.
-#' @param reporter [`Reporter`] instance.
-#'
+
+#' @rdname load_report_button
 #' @return `shiny::moduleServer`
 #' @export
 report_load_srv <- function(id, reporter) {
@@ -48,33 +40,42 @@ report_load_srv <- function(id, reporter) {
 
       archiver_modal <- function() {
         nr_cards <- length(reporter$get_cards())
-        shiny::modalDialog(
-          easyClose = TRUE,
-          shiny::tags$h3("Load the Report"),
-          shiny::tags$hr(),
-          shiny::fileInput(ns("archiver_zip"), "Choose saved Reporter file to Load (a zip file)",
-            multiple = FALSE,
-            accept = c(".zip")
-          ),
-          footer = shiny::div(
-            shiny::tags$button(
-              type = "button",
-              class = "btn btn-danger",
-              `data-dismiss` = "modal",
-              `data-bs-dismiss` = "modal",
-              NULL,
-              "Cancel"
+        shiny::div(
+          class = "teal-reporter reporter-modal",
+          .custom_css_dependency(),
+          shiny::modalDialog(
+            easyClose = TRUE,
+            shiny::tags$h3("Load the Report"),
+            shiny::tags$hr(),
+            shiny::fileInput(ns("archiver_zip"), "Choose saved Reporter file to Load (a zip file)",
+              multiple = FALSE,
+              accept = c(".zip")
             ),
-            shiny::tags$button(
-              id = ns("reporter_load_main"),
-              type = "button",
-              class = "btn btn-primary action-button",
-              NULL,
-              "Load"
+            footer = shiny::div(
+              shiny::tags$button(
+                type = "button",
+                class = "btn btn-outline-secondary",
+                `data-bs-dismiss` = "modal",
+                NULL,
+                "Dismiss"
+              ),
+              shinyjs::disabled(
+                shiny::tags$button(
+                  id = ns("reporter_load_main"),
+                  type = "button",
+                  class = "btn btn-primary action-button",
+                  NULL,
+                  "Load"
+                )
+              )
             )
           )
         )
       }
+
+      shiny::observeEvent(input$archiver_zip, {
+        shinyjs::enable(id = "reporter_load_main")
+      })
 
       shiny::observeEvent(input$reporter_load, {
         shiny::showModal(archiver_modal())
@@ -133,6 +134,12 @@ load_json_report <- function(reporter, zip_path, filename) {
       }
     )
   } else {
-    shiny::showNotification("Failed to load the Reporter file.", type = "error")
+    shiny::showNotification(
+      paste(
+        "Failed to load the Reporter file.",
+        "Please make sure that the filename starts with `report_`."
+      ),
+      type = "error"
+    )
   }
 }
