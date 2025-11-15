@@ -9,7 +9,7 @@
 #' @name reset_report_button
 #'
 #' @param id (`character(1)`) `shiny` module instance id.
-#' @param label (`character(1)`) label of the button. By default it is empty.
+#' @param label (`character(1)`) label of the button. By default `NULL`.
 #' @param reporter (`Reporter`) instance.
 #' @return `NULL`.
 NULL
@@ -18,12 +18,12 @@ NULL
 #' @export
 reset_report_button_ui <- function(id, label = NULL) {
   checkmate::assert_string(label, null.ok = TRUE)
-
-  .outline_button(
+  .action_button_busy(
     shiny::NS(id, "reset_reporter"),
     label = label,
     icon = "x-lg",
-    class = "danger"
+    type = "danger",
+    outline = TRUE
   )
 }
 
@@ -35,12 +35,9 @@ reset_report_button_srv <- function(id, reporter) {
   shiny::moduleServer(id, function(input, output, session) {
     shiny::setBookmarkExclude(c("reset_reporter"))
 
-    ns <- session$ns
-    nr_cards <- length(reporter$get_cards())
-
-    shiny::observeEvent(reporter$get_reactive_add_card(), {
+    shiny::observeEvent(reporter$get_cards(), {
       shinyjs::toggleClass(
-        id = "reset_reporter", condition = reporter$get_reactive_add_card() == 0, class = "disabled"
+        id = "reset_reporter", condition = length(reporter$get_cards()) == 0, class = "disabled"
       )
     })
 
@@ -66,11 +63,19 @@ reset_report_button_srv <- function(id, reporter) {
                 NULL,
                 "Dismiss"
               ),
-              shiny::actionButton(ns("reset_reporter_ok"), "Reset", class = "btn btn-primary")
+              shiny::actionButton(session$ns("reset_reporter_ok"), "Reset", class = "btn btn-primary")
             )
           )
         )
       )
+    })
+
+    shiny::observeEvent(reporter$get_cards(), {
+      if (length(reporter$get_cards())) {
+        shinyjs::enable("reset_reporter")
+      } else {
+        shinyjs::disable("reset_reporter")
+      }
     })
 
     shiny::observeEvent(input$reset_reporter_ok, {

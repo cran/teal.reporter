@@ -1,60 +1,3 @@
-#' Panel group widget
-#'
-#'
-#' @param title (`character`) title of panel
-#' @param ... content of panel
-#' @param collapsed (`logical`, optional)
-#'  whether to initially collapse panel
-#' @param input_id (`character`, optional)
-#'  name of the panel item element. If supplied, this will register a shiny input variable that
-#'  indicates whether the panel item is open or collapsed and is accessed with `input$input_id`.
-#'
-#' @return `shiny.tag`.
-#'
-#' @keywords internal
-panel_item <- function(title, ..., collapsed = TRUE, input_id = NULL) {
-  stopifnot(checkmate::test_character(title, len = 1) || inherits(title, c("shiny.tag", "shiny.tag.list", "html")))
-  checkmate::assert_flag(collapsed)
-  checkmate::assert_string(input_id, null.ok = TRUE)
-
-  div_id <- paste0(input_id, "_div")
-  panel_id <- paste0(input_id, "_panel_body_", sample(1:10000, 1))
-
-
-  shiny::tags$div(.renderHook = function(res_tag) {
-    res_tag$children <- list(
-      shiny::tags$div(
-        class = "card",
-        style = "margin: 0.5rem 0;",
-        shiny::tags$div(
-          class = "card-header",
-          shiny::tags$div(
-            class = ifelse(collapsed, "collapsed", ""),
-            `data-bs-toggle` = "collapse",
-            href = paste0("#", panel_id),
-            `aria-expanded` = ifelse(collapsed, "false", "true"),
-            shiny::icon("angle-down", class = "dropdown-icon"),
-            shiny::tags$label(
-              style = "display: inline;",
-              title,
-            )
-          )
-        ),
-        shiny::tags$div(
-          id = panel_id,
-          class = paste("collapse", ifelse(collapsed, "", "show")),
-          shiny::tags$div(
-            class = "card-body",
-            ...
-          )
-        )
-      )
-    )
-
-    res_tag
-  })
-}
-
 #' Convert content into a `flextable`
 #'
 #' Converts supported table formats into a `flextable` for enhanced formatting and presentation.
@@ -87,31 +30,18 @@ to_flextable <- function(content) {
     rtables::header_section_div(ft) <- mf$header_section_div
     ft <- rtables.officer::tt_to_flextable(ft, total_width = c(grDevices::pdf.options()$width - 1))
   } else if (inherits(content, "data.frame")) {
-    ft <- rtables.officer::tt_to_flextable(
-      rtables::df_to_tt(content)
-    )
+    ft <- if (nrow(content) == 0) {
+      flextable::flextable(content)
+    } else {
+      rtables.officer::tt_to_flextable(
+        rtables::df_to_tt(content)
+      )
+    }
   } else {
     stop(paste0("Unsupported class `(", format(class(content)), ")` when exporting table"))
   }
 
   ft
-}
-
-#' Get the merge index for a single span.
-#' This function retrieves the merge index for a single span,
-#' which is used in merging cells.
-#' @noRd
-#' @keywords internal
-get_merge_index_single <- function(span) {
-  ret <- list()
-  j <- 1
-  while (j < length(span)) {
-    if (span[j] != 1) {
-      ret <- c(ret, list(seq(j, j + span[j] - 1)))
-    }
-    j <- j + span[j]
-  }
-  ret
 }
 
 #' Divide text block into smaller blocks
@@ -160,29 +90,61 @@ global_knitr_details <- function() {
   )
 }
 
-
+#' @export
 #' @keywords internal
-.outline_button <- function(id, label, icon = NULL, class = "primary") {
+format.code_chunk <- function(x, ...) {
+  language <- attr(x, "lang", exact = TRUE)
+  params <- attr(x, "params", exact = TRUE)
+  if (language %in% names(knitr::knit_engines$get())) {
+    sprintf(
+      "```{%s}\n%s\n```",
+      toString(c(language, paste(names(params), params, sep = "="))),
+      NextMethod()
+    )
+  } else {
+    sprintf("```%s\n%s\n```", language, NextMethod())
+  }
+}
+
+#' Teal action button that is disabled while busy
+#'
+#' @inheritParams bslib::input_task_button
+#' @param id (`character(1)`) the id of the button.
+#' @param label (`character(1)`) the label of the button.
+#' @param icon (`character(1)` or `NULL`) the name of the Bootstrap icon to be
+#' displayed on the button.
+#' @param additional_class (`character(1)` or `NULL`) additional CSS class to be
+#' added to the button.
+#'
+#' @return A `shiny` action button that is disabled while busy.
+#' @keywords internal
+.action_button_busy <- function(id,
+                                label,
+                                icon = NULL,
+                                type = "primary",
+                                outline = FALSE,
+                                additional_class = NULL) {
+  checkmate::assert_string(type)
+  checkmate::assert_string(additional_class, null.ok = TRUE)
   shiny::tagList(
     shinyjs::useShinyjs(),
-    .custom_css_dependency(),
-    htmltools::htmlDependency(
-      name = "teal-reporter-busy-disable",
-      version = utils::packageVersion("teal.reporter"),
-      package = "teal.reporter",
-      src = "js",
-      script = "busy-disable.js"
-    ),
+    .custom_css_dependency("outline_button.css"),
+    .custom_js_dependency("busy-disable.js", name = "teal-reporter-busy-disable"),
     shiny::tags$button(
       id = id,
-      class = sprintf("teal-reporter action-button teal-reporter-busy-disable outline-button %s", class),
+      class = c(
+        "teal-reporter action-button teal-reporter-busy-disable",
+        sprintf("btn btn-%1$s %1$s", trimws(type)),
+        if (isTRUE(outline)) "outline-button",
+        additional_class
+      ),
       role = "button",
       style = "text-decoration: none;",
       if (!is.null(icon)) {
         margin_style <- ifelse(is.null(label), "margin: 0 10px 0 10px;", "")
         shiny::tags$span(
           style = margin_style,
-          bsicons::bs_icon(icon, class = sprintf("text-%s", class))
+          bsicons::bs_icon(icon, class = sprintf("text-%s", type))
         )
       },
       label
@@ -191,12 +153,35 @@ global_knitr_details <- function() {
 }
 
 #' @keywords internal
-.custom_css_dependency <- function() {
+.custom_js_dependency <- function(script, name = sprintf("teal-reporter-%s", script)) {
   htmltools::htmlDependency(
-    name = "teal-reporter",
+    name = name,
+    version = utils::packageVersion("teal.reporter"),
+    package = "teal.reporter",
+    src = "js",
+    script = script
+  )
+}
+
+#' @keywords internal
+.custom_css_dependency <- function(stylesheet = "custom.css", name = sprintf("teal-reporter-%s", stylesheet)) {
+  checkmate::assert_string(stylesheet)
+  htmltools::htmlDependency(
+    name = name,
     version = utils::packageVersion("teal.reporter"),
     package = "teal.reporter",
     src = "css",
-    stylesheet = "custom.css"
+    stylesheet = stylesheet
   )
+}
+
+#' @keywords internal
+.accordion_toggle_js_dependency <- function() { # nolint object_length_linter.
+  .custom_js_dependency("accordion-toggle.js", name = "teal-reporter-accordion-toggle")
+}
+
+#' @noRd
+dummy <- function() {
+  R6::R6Class # Used to trick R CMD check for avoiding NOTE about R6
+  jsonlite::fromJSON # Used to trick R CMD check for not detecting jsonlite usage
 }

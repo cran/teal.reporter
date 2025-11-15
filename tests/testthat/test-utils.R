@@ -1,7 +1,3 @@
-testthat::test_that("panel_item", {
-  testthat::expect_s3_class(panel_item("LABEL", shiny::tags$div()), "shiny.tag")
-})
-
 testthat::test_that("to_flextable: supported class `data.frame`", {
   data_frame <- data.frame(A = 1:3, B = 4:6)
   flextable_output <- to_flextable(data_frame)
@@ -38,4 +34,35 @@ testthat::test_that("split_text_block - splits text block into blocks no longer 
   n <- 5
   result <- split_text_block(block_text, n)
   testthat::expect_equal(result, list(block_text))
+})
+
+testthat::describe("format.code_chunk", {
+  it("generates the corresponding R language chunk", {
+    chunk_str <- format(code_chunk("1+1", lang = "R"))
+    testthat::expect_match(chunk_str, "^```\\{R\\}.*```$")
+  })
+  it("generates the corresponding yaml language chunk", {
+    chunk_str <- format(code_chunk("1+1", lang = "yaml"))
+    testthat::expect_match(chunk_str, "^```yaml.*```$")
+  })
+  it("generates the corresponding parameters", {
+    chunk_str <- format(code_chunk("1+1", echo = TRUE))
+    testthat::expect_match(chunk_str, "^```\\{R, echo=TRUE\\}.*```$")
+  })
+  it("generates the corresponding multiple parameters", {
+    chunk_str <- format(code_chunk("1+1", echo = TRUE, another = "\"param\""))
+    testthat::expect_match(chunk_str, "^```\\{R, echo=TRUE, another=\\\"param\\\"\\}.*```$")
+  })
+})
+
+testthat::test_that("global_knitr_details returns a string with description", {
+  result <- global_knitr_details()
+  checkmate::expect_string(result, "character")
+  testthat::expect_match(result, "tidy.opts = ")
+  testthat::expect_match(result, "echo = ")
+  testthat::expect_match(result, "tidy = ")
+})
+
+testthat::test_that("dummy function returns a function used to fix note about function use in R6", {
+  checkmate::expect_function(dummy())
 })

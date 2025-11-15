@@ -18,13 +18,13 @@ NULL
 #' @export
 report_load_ui <- function(id, label = NULL) {
   checkmate::assert_string(label, null.ok = TRUE)
-  .outline_button(
+  .action_button_busy(
     shiny::NS(id, "reporter_load"),
     label = label,
-    icon = "upload"
+    icon = "upload",
+    outline = TRUE
   )
 }
-
 
 #' @rdname load_report_button
 #' @return `shiny::moduleServer`
@@ -37,6 +37,10 @@ report_load_srv <- function(id, reporter) {
     function(input, output, session) {
       shiny::setBookmarkExclude(c("reporter_load_main", "reporter_load"))
       ns <- session$ns
+
+      # Set max request size from package option
+      max_size <- getOption("teal.reporter.max_request_size", 10 * 1024^2)
+      options(shiny.maxRequestSize = max_size)
 
       archiver_modal <- function() {
         nr_cards <- length(reporter$get_cards())
@@ -94,7 +98,7 @@ load_json_report <- function(reporter, zip_path, filename) {
   tmp_dir <- tempdir()
   output_dir <- file.path(tmp_dir, sprintf("report_load_%s", gsub("[.]", "", format(Sys.time(), "%Y%m%d%H%M%OS4"))))
   dir.create(path = output_dir)
-  if (!is.null(zip_path) && grepl("report_", filename)) {
+  if (!is.null(zip_path) && grepl("report(er)?_", filename)) {
     tryCatch(
       expr = zip::unzip(zip_path, exdir = output_dir, junkpaths = TRUE),
       warning = function(cond) {
@@ -143,3 +147,4 @@ load_json_report <- function(reporter, zip_path, filename) {
     )
   }
 }
+1 + 1

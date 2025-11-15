@@ -7,9 +7,8 @@ testthat::test_that("yaml_quoted adds the `quoted` attribute equal to `TRUE`", {
 testthat::test_that("yaml_quoted does not modify the value of the object", {
   object <- "test"
   yaml_quoted_object <- yaml_quoted(object)
-  testthat::expect_equivalent(object, yaml_quoted_object)
+  testthat::expect_equal(object, yaml_quoted_object, ignore_attr = TRUE)
 })
-
 
 testthat::test_that("conv_str_logi - accept only a string", {
   testthat::expect_error(conv_str_logi(2))
@@ -30,6 +29,13 @@ testthat::test_that("conv_str_logi - character TRUE to logical", {
   testthat::expect_true(isTRUE(conv_str_logi("on")))
 })
 
+testthat::test_that("conv_str_logi - character TRUE to logical shows message with silent set to 'FALSE'", {
+  testthat::expect_message(
+    conv_str_logi("true", silent = FALSE),
+    "The 'true' value should be a logical, so it is automatically converted."
+  )
+})
+
 testthat::test_that("conv_str_logi - character FALSE to logical", {
   testthat::expect_true(isFALSE(conv_str_logi("FALSE")))
   testthat::expect_true(isFALSE(conv_str_logi("false")))
@@ -39,7 +45,6 @@ testthat::test_that("conv_str_logi - character FALSE to logical", {
   testthat::expect_true(isFALSE(conv_str_logi("N")))
   testthat::expect_true(isFALSE(conv_str_logi("off")))
 })
-
 
 testthat::test_that("rmd_outputs - all returned out in the rmarkdown namespace", {
   testthat::expect_true(all(rmd_outputs() %in% ls(asNamespace("rmarkdown"))))
@@ -122,7 +127,6 @@ testthat::test_that("as_yaml_auto - convert character logical to logical", {
   )
 })
 
-
 testthat::test_that("as_yaml_auto - do not accept multi outputs without the multi_output argument", {
   testthat::expect_error(
     as_yaml_auto(list(author = "", output = "pdf_document", output = "html_document", toc = TRUE, keep_tex = TRUE),
@@ -136,6 +140,15 @@ testthat::test_that("as_yaml_auto - accept multi outputs with the multi_output a
     as_yaml_auto(list(author = "", output = "pdf_document", output = "html_document", toc = TRUE, keep_tex = TRUE),
       silent = TRUE, multi_output = TRUE
     )
+  )
+})
+
+testthat::test_that("as_yaml_auto - prints a valid yml", {
+  input <- list(author = "", output = "pdf_document", toc = TRUE, keep_tex = TRUE)
+  out <- testthat::capture_output(print(as_yaml_auto(input)))
+  testthat::expect_equal(
+    yaml::read_yaml(text = out),
+    list(author = "", output = list(pdf_document = list(toc = TRUE, keep_tex = TRUE)))
   )
 })
 

@@ -62,19 +62,19 @@ testthat::test_that("append_rcode accepts a character", {
   )
 })
 
-
 testthat::test_that("append_rcode returns self", {
   testthat::expect_no_error(
     ReportCard$new()$append_rcode("x <- 2")
   )
 })
 
-testthat::test_that("get_content returns a list of ContentBlock objects", {
+testthat::test_that("get_content returns a list of objects", {
   testthat::skip_if_not_installed("ggplot2")
 
   card <- ReportCard$new()
   card$append_text("test")$append_plot(ggplot2::ggplot(iris))$append_metadata("SRC", "A <- plot()")
-  testthat::expect_true(checkmate::test_list(card$get_content(), types = "ContentBlock"))
+  testthat::expect_s3_class(card$get_content(), "teal_card")
+  checkmate::expect_list(card$get_content())
 })
 
 testthat::test_that("get_metadata returns a list of mixed objects", {
@@ -82,7 +82,7 @@ testthat::test_that("get_metadata returns a list of mixed objects", {
 
   card <- ReportCard$new()
   card$append_metadata("sth", "test")$append_metadata("sth2", ggplot2::ggplot(iris))
-  testthat::expect_false(checkmate::test_list(card$get_metadata(), types = "ContentBlock"))
+  testthat::expect_failure(testthat::expect_s3_class(card$get_metadata(), "teal_card"))
 })
 
 testthat::test_that("get_metadata returns a named list", {
@@ -135,18 +135,15 @@ testthat::test_that("append_metadata throws error if keys are duplicated", {
   )
 })
 
-
-testthat::test_that("The deep copy constructor copies the file in the content blocks", {
+testthat::test_that("The deep copy constructor copies the plot object", {
   testthat::skip_if_not_installed("ggplot2")
   card <- ReportCard$new()
   card$append_text("test")$append_plot(ggplot2::ggplot(iris))$append_metadata("SRC", "A <- plot(1)")
   card_copy <- card$clone(deep = TRUE)
-  original_filepath <- card$get_content()[[2]]$get_content()
-  copied_filepath <- card_copy$get_content()[[2]]$get_content()
-  testthat::expect_true(original_filepath != copied_filepath)
+  testthat::expect_identical(card$get_content()[[2]], card_copy$get_content()[[2]])
 })
 
-testthat::test_that("The deep copy constructor copies the non ContentBlock objects", {
+testthat::test_that("The deep copy constructor copies the objects", {
   testthat::skip_if_not_installed("ggplot2")
 
   card <- ReportCard$new()
@@ -167,47 +164,27 @@ testthat::test_that("setting and getting a name to the ReportCard", {
   )
 })
 
-testthat::skip_if_not_installed("ggplot2")
-
-card <- ReportCard$new()
-rcode <- "ggplot2::ggplot(iris, ggplot2::aes(x = Petal.Length)) + ggplot2::geom_histogram()"
-card$append_text("Header 2 text", "header2")
-card$append_text("A paragraph of default text", "header2")
-card$append_rcode(rcode)
-card$append_plot(eval(str2lang(rcode)))
-card$append_html(shiny::tags$div("test"))
-
-picture_filename <- basename(card$get_content()[[4]]$get_content())
-temp_dir <- file.path(tempdir(), "test")
-dir.create(temp_dir)
-
-testthat::test_that("to_list internally triggers to_list on each Block", {
+testthat::test_that("set_content_names sets the names of the content", {
+  card <- ReportCard$new()
+  card$append_text("test1")$append_text("test2")
+  card$set_content_names(c("first", "second"))
   testthat::expect_identical(
-    card$to_list(temp_dir),
-    list(blocks = list(
-      TextBlock = list(text = "Header 2 text", style = "header2"),
-      TextBlock = list(text = "A paragraph of default text", style = "header2"),
-      RcodeBlock = list(text = rcode, params = list()),
-      PictureBlock = list(basename = picture_filename),
-      HTMLBlock = list(content = shiny::tags$div("test"))
-    ), metadata = list(), name = character(0))
+    names(card$get_content()),
+    c("first", "second")
   )
-  testthat::expect_true(picture_filename %in% list.files(temp_dir))
 })
 
-testthat::test_that("from_list", {
-  cardf <- ReportCard$new()$from_list(
-    list(blocks = list(
-      TextBlock = list(text = "Header 2 text", style = "header2"),
-      TextBlock = list(text = "A paragraph of default text", style = "header2"),
-      RcodeBlock = list(text = rcode, params = list()),
-      PictureBlock = list(basename = picture_filename),
-      HTMLBlock = list(content = shiny::tags$div("test"))
-    ), metadata = list()),
-    temp_dir
-  )
-  testthat::expect_true(inherits(cardf, "ReportCard"))
-  testthat::expect_length(cardf$get_content(), 5L)
+testthat::test_that("to_list returns content", {
+  card <- ReportCard$new()
+  card$append_text("test1")$append_text("test2")
+  testthat::expect_type(card$to_list(), "list")
 })
 
-unlink(temp_dir, recursive = TRUE)
+testthat::test_that("from_list builds the original teal_card", {
+  card <- ReportCard$new()
+  card$append_text("test1")$append_text("test2")
+  result <- card$to_list()
+  card2 <- ReportCard$new()$from_list(result)
+  # remove attributes for comparison
+  testthat::expect_equal(unname(card2$get_content()), unname(card$get_content()))
+})

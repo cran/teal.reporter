@@ -1,3 +1,14 @@
+# teal.reporter 0.6.0
+
+### New features
+
+* Adds editing capabilities to report cards in the previewer modal for the title and text contents.
+* Adds `teal_card` class that replaces `ReportCard` R6 class. It retains all its functionalities in a S4 with less complexity. It allows for easier modifications and insertion of new report content.
+* Adds `teal_report` class that extends from `teal.data::teal_data` that allows to keep contents of the report card.
+* `teal_report` is updated automatically with executed code and its outputs are stored as well.
+* Supports `flextable` and `gtsummary` objects.
+* Soft deprecated `ReportCard`.
+
 # teal.reporter 0.5.0
 
 ### Breaking changes
@@ -9,7 +20,7 @@
 ### Enhancements
 
 * Moves `finalize()` methods to private in R6 classes.
-* Changes to support new UI/UX in teal framework.
+* Improved the layout and appearance of the reporter with new UI design.
 * Added `preview_report_button_ui` and `preview_report_button_srv` to create a shiny module that creates a button to open the report previewer in a modal.
 * Improve error message when reporter zip file is not named correctly (#365)
 
