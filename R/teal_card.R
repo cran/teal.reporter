@@ -101,6 +101,9 @@ teal_card.qenv <- function(...) {
 #' @param value (`teal_card`) object to set in the `teal_report`.
 #' @export
 `teal_card<-` <- function(x, value) {
+  if (inherits(x, "qenv.error")) { # qenv.error does nothing
+    return(x)
+  }
   x <- methods::as(x, "teal_report")
   checkmate::assert_class(x, "teal_report")
   x@teal_card <- as.teal_card(value)
@@ -131,7 +134,7 @@ as.teal_card <- function(x) { # nolint: object_name.
   if (inherits(x, "teal_card")) {
     if (length(x) && !checkmate::test_names(names(x), type = "unique")) { # Fix names if not unique or missing
       names(x) <- substr(
-        vapply(seq_len(length(x)), function(ix) rlang::hash(list(ix, Sys.time(), x[[ix]])), character(1L)),
+        vapply(seq_along(x), function(ix) rlang::hash(list(ix, Sys.time(), x[[ix]])), character(1L)),
         1,
         8
       )
@@ -159,8 +162,11 @@ c.teal_card <- function(...) {
             v
           } else {
             warning(
-              "Appended `teal_card` doesn't remove some of the elements from previous `teal_card`.\n",
-              "Restoring original content and adding only new items to the end of the card."
+              warningCondition(
+                "Appended `teal_card` doesn't remove some of the elements from previous `teal_card`.\n",
+                "Restoring original content and adding only new items to the end of the card.",
+                class = "teal_card_append"
+              )
             )
             utils::modifyList(u, v)
           }

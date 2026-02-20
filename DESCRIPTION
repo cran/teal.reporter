@@ -1,7 +1,7 @@
 Package: teal.reporter
 Title: Reporting Tools for 'shiny' Modules
-Version: 0.6.0
-Date: 2025-11-14
+Version: 0.6.1
+Date: 2026-02-16
 Authors@R: c(
     person("Dawid", "Kaledkowski", , "dawid.kaledkowski@roche.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-9533-457X")),
@@ -55,7 +55,7 @@ Encoding: UTF-8
 Language: en-US
 RoxygenNote: 7.3.3
 NeedsCompilation: no
-Packaged: 2025-11-14 15:18:06 UTC; sanchosl
+Packaged: 2026-02-20 00:32:58 UTC; unardid
 Author: Dawid Kaledkowski [aut, cre] (ORCID:
     <https://orcid.org/0000-0001-9533-457X>),
   Kartikeya Kirar [aut] (ORCID: <https://orcid.org/0009-0005-1258-4757>),
@@ -68,4 +68,4 @@ Author: Dawid Kaledkowski [aut, cre] (ORCID:
   F. Hoffmann-La Roche AG [cph, fnd]
 Maintainer: Dawid Kaledkowski <dawid.kaledkowski@roche.com>
 Repository: CRAN
-Date/Publication: 2025-11-15 11:50:02 UTC
+Date/Publication: 2026-02-20 10:20:08 UTC
