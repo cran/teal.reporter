@@ -1,9 +1,9 @@
 Package: teal.reporter
 Title: Reporting Tools for 'shiny' Modules
-Version: 0.6.1
-Date: 2026-02-16
+Version: 0.6.2
+Date: 2026-06-26
 Authors@R: c(
-    person("Dawid", "Kaledkowski", , "dawid.kaledkowski@roche.com", role = c("aut", "cre"),
+    person("Dawid", "Kaledkowski", , "dawid.kaledkowski@roche.com", role = "aut",
            comment = c(ORCID = "0000-0001-9533-457X")),
     person("Kartikeya", "Kirar", , "kartikeya.kirar@businesspartner.roche.com", role = "aut",
            comment = c(ORCID = "0009-0005-1258-4757")),
@@ -12,7 +12,7 @@ Authors@R: c(
     person("Konrad", "Pagacz", role = "aut"),
     person("Mahmoud", "Hallal", , "mahmoud.hallal@roche.com", role = "aut"),
     person("Chendi", "Liao", , "chendi.liao@roche.com", role = "rev"),
-    person("Dony", "Unardi", , "unardid@gene.com", role = "rev"),
+    person("Dony", "Unardi", , "unardid@gene.com", role = c("rev", "cre")),
     person("F. Hoffmann-La Roche AG", role = c("cph", "fnd"))
   )
 Description: Prebuilt 'shiny' modules containing tools for the generation
@@ -53,10 +53,10 @@ Config/Needs/website: insightsengineering/nesttemplate
 Config/testthat/edition: 3
 Encoding: UTF-8
 Language: en-US
-RoxygenNote: 7.3.3
+Config/roxygen2/version: 8.0.0
 NeedsCompilation: no
-Packaged: 2026-02-20 00:32:58 UTC; unardid
-Author: Dawid Kaledkowski [aut, cre] (ORCID:
+Packaged: 2026-06-27 11:36:09 UTC; unardid
+Author: Dawid Kaledkowski [aut] (ORCID:
     <https://orcid.org/0000-0001-9533-457X>),
   Kartikeya Kirar [aut] (ORCID: <https://orcid.org/0009-0005-1258-4757>),
   Marcin Kosinski [aut],
@@ -64,8 +64,8 @@ Author: Dawid Kaledkowski [aut, cre] (ORCID:
   Konrad Pagacz [aut],
   Mahmoud Hallal [aut],
   Chendi Liao [rev],
-  Dony Unardi [rev],
+  Dony Unardi [rev, cre],
   F. Hoffmann-La Roche AG [cph, fnd]
-Maintainer: Dawid Kaledkowski <dawid.kaledkowski@roche.com>
+Maintainer: Dony Unardi <unardid@gene.com>
 Repository: CRAN
-Date/Publication: 2026-02-20 10:20:08 UTC
+Date/Publication: 2026-06-29 07:40:02 UTC

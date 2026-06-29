@@ -1,6 +1,6 @@
-002a242cf2a219f50a57152593277514 *DESCRIPTION
+9d045de3554c5a16c9551689a414cdbe *DESCRIPTION
 4b64d5310ef06784ad492ee7736b93bf *NAMESPACE
-d8d688cb60db37488f480f406089cf05 *NEWS.md
+2b6773f19b50f1e51111f7aa0c0c95a6 *NEWS.md
 7ab77c81c8824b5c92b0983ee3591bba *R/LoadReporterModule.R
 8391b651b58fc3054b20e7b843493391 *R/ReportCard.R
 eca8312c42c20d0d3bcac3db34597f1b *R/Reporter.R
@@ -28,7 +28,7 @@ e9d823c1e9ec9e83254d428285230d21 *R/utils.R
 0777fa48447196992f006bd38c96b680 *R/yaml_utils.R
 6c2e580c50f8cc6f3084dc78b0180f9b *R/zzz.R
 12ec95b32f1266cf61edf3be6f0b5514 *README.md
-24b1638bbeb1cae4bec5dc6a06738ea0 *build/vignette.rds
+5775b4534cb4fd02ca2d3e3de1e03cf5 *build/vignette.rds
 4496722de9617adbe2c6f5b46373611b *inst/WORDLIST
 e341b428c7cf1b26401ee232ba67a325 *inst/css/custom.css
 2a19cdb8b23c8d59395f27e11ad5fa5f *inst/css/outline_button.css
@@ -39,14 +39,14 @@ b6359bc32503745c8e1eb3d969f79ba1 *inst/doc/reportable-shiny-application.Rmd
 9514f96668d6b60bb549cf219504666f *inst/doc/reportable-shiny-application.html
 f1fcd992404e1cb77f510485b3d3dffe *inst/doc/teal-report-class.R
 51dff629028b954b3e048eef47d36b64 *inst/doc/teal-report-class.Rmd
-7b4d346fd29dcc69d6b5a978cd8a50c2 *inst/doc/teal-report-class.html
+5cb11f772d57c4a1e2603fc9c7e0221d *inst/doc/teal-report-class.html
 a4dc8ea06cc16dc3f06c250c39752ae0 *inst/js/accordion-toggle.js
 295d56000ba49130266f9fc543229c74 *inst/js/busy-disable.js
 4db78fb7fe6d6e0e90975f09066d56eb *inst/js/extendShinyJs.js
 ac5478d8801efb1af0e3e4ff820ea4c3 *inst/pkgdown/_pkgdown.yml
 c4195f6f7107aeba8b31968144940c58 *inst/pkgdown/templates/footer.html
-a71ea1dd393273459b91d59973d42f6d *man/ReportCard.Rd
-efe4cf6a777f11e0b437f8fb2ac82da9 *man/Reporter.Rd
+1300e39dac65e4d8966b89b5a2f5921e *man/ReportCard.Rd
+adc07b0522af3b7d3a1bc6cc9a2c6f8e *man/Reporter.Rd
 64b30187de0cfcf37ede5cee4a6e4a90 *man/add_card_button.Rd
 f6204a5be3c6052aea89f4b8a19d20e3 *man/as_yaml_auto.Rd
 90f412e0519c1ecfe726072d796746ee *man/c.teal_report.Rd
@@ -84,7 +84,7 @@ a996d447b740f8ad514acba3380dbe54 *man/rmd_output_arguments.Rd
 c3cb1b4a53adfeef21ca545b293f293a *man/simple_reporter.Rd
 9c789b973fa4583871ca797321ae6345 *man/split_text_block.Rd
 f43791507a1fa1c423ba0de2a2200a35 *man/srv_editor_block.Rd
-4c77feeaf746d8d85303ddc70a5e55b6 *man/teal.reporter-package.Rd
+187069b3cf47b66a6497d5f149655a81 *man/teal.reporter-package.Rd
 7e34942fdbba06ba5ccfe4e589159a56 *man/teal_card.Rd
 377cdbbdb7f66ad53d31b9211b36ac81 *man/teal_report-class.Rd
 21bf5ca481c0132c08082c777cd2e324 *man/teal_report.Rd

@@ -1,3 +1,7 @@
+# teal.reporter 0.6.2
+
+* Update maintainer.
+
 # teal.reporter 0.6.1
 
 ### Miscellaneous
