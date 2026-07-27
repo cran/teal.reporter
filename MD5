@@ -1,9 +1,9 @@
-9d045de3554c5a16c9551689a414cdbe *DESCRIPTION
+e2e4ec9498d34668de736b8a664eb58a *DESCRIPTION
 4b64d5310ef06784ad492ee7736b93bf *NAMESPACE
-2b6773f19b50f1e51111f7aa0c0c95a6 *NEWS.md
+5d71e58030534b41179b7a04d3d47fcb *NEWS.md
 7ab77c81c8824b5c92b0983ee3591bba *R/LoadReporterModule.R
 8391b651b58fc3054b20e7b843493391 *R/ReportCard.R
-eca8312c42c20d0d3bcac3db34597f1b *R/Reporter.R
+ca655246bcd505d0e3a980f9968e2af5 *R/Reporter.R
 101e49dba0d93993c8a6639872ad37b3 *R/ResetModule.R
 2c576480c8e5865ed427d7f15b11ecbe *R/SimpleReporter.R
 195a9347ef0d28402f644e3d5fadc284 *R/add_card.R
@@ -29,7 +29,7 @@ e9d823c1e9ec9e83254d428285230d21 *R/utils.R
 6c2e580c50f8cc6f3084dc78b0180f9b *R/zzz.R
 12ec95b32f1266cf61edf3be6f0b5514 *README.md
 5775b4534cb4fd02ca2d3e3de1e03cf5 *build/vignette.rds
-4496722de9617adbe2c6f5b46373611b *inst/WORDLIST
+236da0fc76e21eb78a3b3053110e17ae *inst/WORDLIST
 e341b428c7cf1b26401ee232ba67a325 *inst/css/custom.css
 2a19cdb8b23c8d59395f27e11ad5fa5f *inst/css/outline_button.css
 cae29e7814aa7024159be2ded691df5b *inst/doc/getting-started-with-teal-reporter.Rmd
@@ -39,7 +39,7 @@ b6359bc32503745c8e1eb3d969f79ba1 *inst/doc/reportable-shiny-application.Rmd
 9514f96668d6b60bb549cf219504666f *inst/doc/reportable-shiny-application.html
 f1fcd992404e1cb77f510485b3d3dffe *inst/doc/teal-report-class.R
 51dff629028b954b3e048eef47d36b64 *inst/doc/teal-report-class.Rmd
-5cb11f772d57c4a1e2603fc9c7e0221d *inst/doc/teal-report-class.html
+bbb7603424ad6e99e56e1bcf91722211 *inst/doc/teal-report-class.html
 a4dc8ea06cc16dc3f06c250c39752ae0 *inst/js/accordion-toggle.js
 295d56000ba49130266f9fc543229c74 *inst/js/busy-disable.js
 4db78fb7fe6d6e0e90975f09066d56eb *inst/js/extendShinyJs.js
